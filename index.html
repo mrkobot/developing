@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under the Hood — CIRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: transparent;
+    color: #111;
+    padding: 0;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .dark {
+    background: #000;
+    border-radius: 14px;
+    padding: 2.5rem 2rem;
+  }
+
+  .sdgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .sdc {
+    background: #e8e8e8;
+    border: 5px solid rgba(255,255,255,0.85);
+    border-radius: 14px;
+    padding: 20px 22px 22px;
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+  }
+
+  .sdc:hover {
+    transform: scale(1.04);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    z-index: 1;
+  }
+
+  .sid {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #e8643b;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+
+  .sn {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0a0a0a;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .sd {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #000;
+  }
+
+  .sd p + p { margin-top: 10px; }
+
+  @media (max-width: 720px) {
+    .sdgrid {
+      grid-template-columns: 1fr;
+    }
+    .dark {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="dark">
+  <div class="sdgrid">
+
+    <div class="sdc">
+      <span class="sid">01</span>
+      <span class="sn">Common Standards</span>
+      <div class="sd">
+        <p>Ask two practitioners, "How effective am I as an AI user?" and their models will generate two explanations that cannot be meaningfully compared.</p>
+        <p>Assessment requires a rubric. Everyone is measured against the same criteria.</p>
+      </div>
+    </div>
+
+    <div class="sdc">
+      <span class="sid">02</span>
+      <span class="sn">Meaningful Evidence</span>
+      <div class="sd">
+        <p>Most AI assessments are built on thin data because users wisely withhold the personal information meaningful analysis requires.</p>
+        <p>We do not face that trade-off. We are a non-profit that gives you our tools, and asks for zero data in return.</p>
+      </div>
+    </div>
+
+    <div class="sdc">
+      <span class="sid">03</span>
+      <span class="sn">Shared Language</span>
+      <div class="sd">
+        <p>A named gap is not a verdict but a map. It shows where growth can be found.</p>
+        <p>Shared language enables collective learning. This is how the Co-Intelligence Readiness Framework transforms personal anxiety into collective development.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function sendHeight() {
+    window.parent.postMessage({ type: 'X-resize', height: document.body.scrollHeight }, '*');
+  }
+  window.addEventListener('load', function() { setTimeout(sendHeight, 200); });
+  window.addEventListener('resize', function() { setTimeout(sendHeight, 100); });
+  if (window.ResizeObserver) {
+    new ResizeObserver(function() { setTimeout(sendHeight, 100); }).observe(document.body);
+  }
+</script>
+</body>
+</html>
