@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under the Hood — CIRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+html{width:100%}
+
+body{
+  background:transparent;
+  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding:0;
+  margin:0;
+  width:100%;
+}
+
+/* ── Outer card ── */
+.card{
+  background:white;
+  border-radius:20px;
+  overflow:hidden;
+  width:100%;
+  max-width:960px;
+  margin:0 auto;
+  display:block;
+}
+
+/* ── Dark section: Claude UI ── */
+.dark{
+  background:#000;
+}
+
+/* Claude top bar */
+.c-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 18px;
+  border-bottom:0.5px solid rgba(255,255,255,0.06);
+}
+.c-bar-l{display:flex;align-items:center;gap:10px}
+.c-bar-name{
+  font-size:14px;
+  font-weight:600;
+  color:rgba(255,255,255,0.8);
+  letter-spacing:-0.01em;
+}
+.c-bar-r{display:flex;align-items:center;gap:16px}
+.bar-icon{width:17px;height:17px;opacity:0.35}
+
+/* Chat area */
+.chat{padding:22px 22px 0}
+
+/* User bubble */
+.u-bubble{
+  margin-left:auto;
+  max-width:210px;
+  background:#2a2a2c;
+  border:0.5px solid #3c3c3e;
+  border-radius:16px 16px 4px 16px;
+  padding:11px 13px;
+  margin-bottom:72px;
+}
+.u-text{
+  font-size:9.5px;color:#888;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+  margin-bottom:7px;
+}
+.u-badge{
+  display:inline-block;background:#3c3c3e;border-radius:4px;
+  font-size:9px;font-weight:700;letter-spacing:0.08em;color:#888;padding:2px 7px;
+}
+
+/* Thinking lines */
+.thinking{display:flex;flex-direction:column;gap:9px;max-width:520px}
+.t-line{display:flex;align-items:center;gap:9px;font-size:13px;color:#888;line-height:1.4}
+.t-line-2{opacity:0;animation:appear 0.4s ease forwards 1.8s}
+.spin-icon{width:15px;height:15px;flex-shrink:0;animation:spin 2s linear infinite}
+.chat-icon{width:15px;height:15px;flex-shrink:0}
+.cursor{
+  display:inline-block;width:2px;height:12px;background:#888;
+  margin-left:1px;vertical-align:middle;opacity:0;
+  animation:appear 0s forwards 2.2s,blink 1s step-end infinite 2.2s;
+}
+
+/* ── Floating cards ── */
+.float-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  padding:60px 18px 20px;
+}
+.fc{
+  position:relative;
+  background:#e8e8e8;
+  border:5px solid rgba(255,255,255,0.85);
+  border-radius:14px;
+  padding:20px 22px 22px;
+  box-shadow:none;
+}
+.fc::before,.fc::after{display:none}
+
+.fc-num{
+  display:block;
+  font-size:10px;font-weight:600;letter-spacing:0.1em;
+  color:#e8643b;margin-bottom:7px;
+}
+.fc-head{font-size:16px;font-weight:800;color:#0a0a0a;line-height:1.25}
+.fc-dim{color:#0a0a0a;font-weight:800}
+.fc-body{font-size:13.5px;line-height:1.75;color:#000;margin-top:12px}
+.fc-body p+p{margin-top:10px}
+
+/* ── Input bar ── */
+.c-input-wrap{padding:60px 16px 16px}
+.c-input{
+  background:#2a2a2c;border:0.5px solid #3a3a3c;
+  border-radius:14px;padding:13px 16px 10px;
+}
+.c-placeholder{font-size:14px;color:rgba(255,255,255,0.22);padding-bottom:10px}
+.c-input-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:0.5px solid rgba(255,255,255,0.06);padding-top:8px;
+}
+.c-input-l{display:flex;align-items:center}
+.plus{
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:rgba(255,255,255,0.35);font-weight:300;line-height:1;
+}
+.c-input-r{display:flex;align-items:center;gap:8px}
+.model-pill{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.06);border-radius:8px;padding:4px 10px;
+}
+.m-text{font-size:11px;color:rgba(255,255,255,0.42);font-weight:500}
+.m-div{width:0.5px;height:11px;background:rgba(255,255,255,0.14)}
+.q-text{font-size:11px;color:rgba(255,255,255,0.3)}
+.icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.stop-btn{
+  width:30px;height:30px;background:rgba(255,255,255,0.08);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+}
+.disclaimer{
+  text-align:center;font-size:11px;
+  color:rgba(255,255,255,0.18);padding:6px 0 14px;
+}
+
+/* ── Animations ── */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes appear{to{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── Mobile ── */
+@media(max-width:720px){
+  .float-row{
+    grid-template-columns:1fr;
+    gap:10px;
+    padding:40px 14px 20px;
+  }
+  .fc{background:#e8e8e8;border:5px solid rgba(255,255,255,0.85)}
+  .c-bar,.disclaimer{display:none}
+  .chat{padding:18px 16px 0}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="dark">
+
+    <!-- Top bar -->
+    <div class="c-bar">
+      <div class="c-bar-l">
+        <svg class="bar-icon" viewBox="0 0 17 17" fill="none">
+          <line x1="2" y1="4.5" x2="15" y2="4.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="2" y1="8.5" x2="15" y2="8.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="2" y1="12.5" x2="15" y2="12.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <span class="c-bar-name">Claude</span>
+      </div>
+      <div class="c-bar-r">
+        <svg class="bar-icon" viewBox="0 0 17 17" fill="none">
+          <path d="M8.5 2v13M2 8.5h13" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <svg class="bar-icon" viewBox="0 0 17 17" fill="none">
+          <circle cx="8.5" cy="6" r="2.8" stroke="white" stroke-width="1.3"/>
+          <path d="M2 15.5c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Chat area -->
+    <div class="chat">
+
+      <div class="u-bubble">
+        <p class="u-text">You are conducting a Co-Intelligence Readiness Assessment (CIRA v5). Your task is to review my conversation history with you and produce an honest, ev...</p>
+        <span class="u-badge">PASTED</span>
+      </div>
+
+      <div class="thinking">
+        <div class="t-line">
+          <svg class="spin-icon" viewBox="0 0 16 16" fill="none">
+            <line x1="8" y1="1"     x2="8"     y2="4.5"  stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="8" y1="11.5"  x2="8"     y2="15"   stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="1"    y1="8"  x2="4.5"   y2="8"    stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="11.5" y1="8"  x2="15"    y2="8"    stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="2.93"  y1="2.93"  x2="5.41"  y2="5.41"  stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="10.59" y1="10.59" x2="13.07" y2="13.07" stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="13.07" y1="2.93"  x2="10.59" y2="5.41"  stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="5.41"  y1="10.59" x2="2.93"  y2="13.07" stroke="#e8643b" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Reading conversation history for evidence of co-intelligent practice</span>
+        </div>
+        <div class="t-line t-line-2">
+          <svg class="chat-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5C4.41 1.5 1.5 4.13 1.5 7.38c0 1.32.44 2.54 1.18 3.52L1.5 14.5l3.18-1.04A7.18 7.18 0 008 13.25c3.59 0 6.5-2.62 6.5-5.87S11.59 1.5 8 1.5z" stroke="#777" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+          <span>Scoring against the Co-Intelligence Readiness Framework<span class="cursor"></span></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Floating cards -->
+    <div class="float-row">
+
+      <div class="fc">
+        <span class="fc-num">01</span>
+        <span class="fc-head">Patterns, <span class="fc-dim">not fiction</span></span>
+        <div class="fc-body">
+          <p>Most AI assessment tools produce fiction because users would never trust a subscription-based company with the bank of personal information that would make analysis meaningful. We don't face this trade-off because we are a non-profit that gives our tools freely.</p>
+        </div>
+      </div>
+
+      <div class="fc">
+        <span class="fc-num">02</span>
+        <span class="fc-head">Rubric-scored</span>
+        <div class="fc-body">
+          <p>Two practitioners who ask their AI "How effective am I as an AI user?" will receive explanations that mean nothing—separately or together.</p>
+          <p>Assessment requires a rubric: We measure practice for everyone under identical criteria.</p>
+        </div>
+      </div>
+
+      <div class="fc">
+        <span class="fc-num">03</span>
+        <span class="fc-head">Gaps that develop</span>
+        <div class="fc-body">
+          <p>A named gap is not a verdict—it is a treasure map that shows you where growth can be found.</p>
+          <p>Shared language enables collective learning, and this is how The Co-Intelligence Readiness Framework turns personal anxiety into collective development.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input bar -->
+    <div class="c-input-wrap">
+      <div class="c-input">
+        <p class="c-placeholder">Write a message...</p>
+        <div class="c-input-bottom">
+          <div class="c-input-l">
+            <div class="plus">+</div>
+          </div>
+          <div class="c-input-r">
+            <div class="model-pill">
+              <span class="m-text">Sonnet 4.6</span>
+              <div class="m-div"></div>
+              <span class="q-text">High</span>
+            </div>
+            <div class="icon-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="4.5" y="1" width="5" height="8" rx="2.5" stroke="rgba(255,255,255,0.38)" stroke-width="1.2"/>
+                <path d="M2 7c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke="rgba(255,255,255,0.38)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="7" y1="12" x2="7" y2="14" stroke="rgba(255,255,255,0.38)" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="stop-btn">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <rect x="2" y="2" width="8" height="8" rx="1.5" fill="rgba(255,255,255,0.28)"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="disclaimer">Claude is AI and can make mistakes. Please double-check responses.</p>
+
+  </div>
+</div>
+
+<script>
+function sendHeight(){
+  window.parent.postMessage({type:'X-resize',height:document.body.scrollHeight},'*');
+}
+window.addEventListener('load',function(){setTimeout(sendHeight,200)});
+window.addEventListener('resize',function(){setTimeout(sendHeight,100)});
+if(window.ResizeObserver){
+  new ResizeObserver(function(){setTimeout(sendHeight,100)}).observe(document.body);
+}
+</script>
+
+</body>
+</html>
