@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under the Hood — CIRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: transparent;
+    color: #111;
+    padding: 0;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .dark {
+    background: #000;
+    border-radius: 14px;
+    padding: 2.5rem 2rem;
+  }
+
+  .sdgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  /* Card shell: drives entrance animation only */
+  .sdc {
+    height: 270px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .sdc.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sdc-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    background: #ede9e4;
+    border: 5px solid rgba(255,255,255,0.85);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sdc.visible:hover .sdc-inner {
+      transform: scale(1.025);
+      box-shadow: 0 0 40px rgba(255,255,255,0.12);
+    }
+
+    .sdc.visible:hover .sdc-front {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    .sdc.visible:hover .sdc-back {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+
+  /* Touch devices: tap toggles this class via JS instead of :hover */
+  .sdc.is-active .sdc-inner {
+    transform: scale(1.025);
+    box-shadow: 0 0 40px rgba(255,255,255,0.12);
+  }
+
+  .sdc.is-active .sdc-front {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+
+  .sdc.is-active .sdc-back {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Front and back occupy the same space; hover crossfades one into the other */
+  .sdc-front,
+  .sdc-back {
+    position: absolute;
+    inset: 0;
+    padding: 24px 22px 22px;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .sdc-front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sdc-back {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+  }
+
+  .sid {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #e8643b;
+    margin-bottom: 8px;
+  }
+
+  .sn {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0a0a0a;
+    line-height: 1.2;
+  }
+
+  .sn-back {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0a0a0a;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .sd {
+    font-size: 11.5px;
+    line-height: 1.65;
+    color: #000;
+  }
+
+  .sd p + p { margin-top: 8px; }
+
+  /* Icon container — visible immediately, internal parts carry the animation */
+  .card-icon {
+    width: 52px;
+    height: 52px;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /* ---- Ruler (Common Standards): outline draws, then ticks rise in sequence ---- */
+  .icon-ruler .ic-outline {
+    stroke-dasharray: 116;
+    stroke-dashoffset: 116;
+  }
+  .icon-ruler .ic-tick {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  .card-icon.icon-in.icon-ruler .ic-outline {
+    animation: drawLine 0.55s ease forwards;
+  }
+  .card-icon.icon-in.icon-ruler .ic-tick:nth-of-type(2) { animation: tickIn 0.3s ease forwards; animation-delay: 0.5s; }
+  .card-icon.icon-in.icon-ruler .ic-tick:nth-of-type(3) { animation: tickIn 0.3s ease forwards; animation-delay: 0.68s; }
+  .card-icon.icon-in.icon-ruler .ic-tick:nth-of-type(4) { animation: tickIn 0.3s ease forwards; animation-delay: 0.86s; }
+  .card-icon.icon-in.icon-ruler .ic-tick:nth-of-type(5) { animation: tickIn 0.3s ease forwards; animation-delay: 1.04s; }
+
+  /* ---- Magnifying glass (Meaningful Evidence): lens enlarges, handle settles, check draws ---- */
+  .icon-glass .ic-glass-circle {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.45);
+    opacity: 0;
+  }
+  .icon-glass .ic-glass-handle {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  .icon-glass .ic-check {
+    stroke-dasharray: 18;
+    stroke-dashoffset: 18;
+  }
+  .card-icon.icon-in.icon-glass .ic-glass-circle {
+    animation: glassGrow 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .card-icon.icon-in.icon-glass .ic-glass-handle {
+    animation: handleIn 0.35s ease forwards;
+    animation-delay: 0.55s;
+  }
+  .card-icon.icon-in.icon-glass .ic-check {
+    animation: drawLine 0.4s ease forwards;
+    animation-delay: 0.95s;
+  }
+
+  /* ---- Speech bubbles (Shared Language): first bubble in, second follows ---- */
+  .icon-bubbles .ic-bubble-1 {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  .icon-bubbles .ic-bubble-2 {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  .card-icon.icon-in.icon-bubbles .ic-bubble-1 {
+    animation: bubble1In 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .card-icon.icon-in.icon-bubbles .ic-bubble-2 {
+    animation: bubble2In 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.65s;
+  }
+
+  @keyframes drawLine { to { stroke-dashoffset: 0; } }
+  @keyframes tickIn { to { transform: scaleY(1); opacity: 1; } }
+  @keyframes glassGrow {
+    0%   { transform: scale(0.45); opacity: 0; }
+    65%  { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes handleIn { to { transform: scale(1); opacity: 1; } }
+  @keyframes bubble1In { to { transform: scale(1); opacity: 1; } }
+  @keyframes bubble2In { to { transform: scale(1); opacity: 0.55; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sdc { transition: none; opacity: 1; transform: none; }
+    .sdc-front, .sdc-back, .sdc-inner { transition: none; }
+    .icon-ruler .ic-outline { stroke-dashoffset: 0; }
+    .icon-ruler .ic-tick { transform: scaleY(1); opacity: 1; }
+    .icon-glass .ic-glass-circle,
+    .icon-glass .ic-glass-handle { transform: scale(1); opacity: 1; }
+    .icon-glass .ic-check { stroke-dashoffset: 0; }
+    .icon-bubbles .ic-bubble-1 { transform: scale(1); opacity: 1; }
+    .icon-bubbles .ic-bubble-2 { transform: scale(1); opacity: 0.55; }
+  }
+
+  @media (max-width: 720px) {
+    .sdgrid { grid-template-columns: 1fr; }
+    .dark { padding: 1.5rem 1rem; }
+    .sdc { height: 250px; }
+  }
+</style>
+</head>
+<body>
+<div class="dark">
+  <div class="sdgrid">
+
+    <!-- Card 01: Common Standards -->
+    <div class="sdc">
+      <div class="sdc-inner">
+        <div class="sdc-front">
+          <svg class="card-icon icon-ruler" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect class="ic-outline" x="4" y="19" width="44" height="14" rx="3" stroke="#e8643b" stroke-width="2.4" fill="none"/>
+            <line class="ic-tick" x1="13" y1="19" x2="13" y2="25" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
+            <line class="ic-tick" x1="22" y1="19" x2="22" y2="27" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
+            <line class="ic-tick" x1="31" y1="19" x2="31" y2="25" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
+            <line class="ic-tick" x1="40" y1="19" x2="40" y2="25" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="sn">Common Standards</span>
+        </div>
+        <div class="sdc-back">
+          <span class="sid">01</span>
+          <span class="sn-back">Common Standards</span>
+          <div class="sd">
+            <p>Ask two practitioners, "How effective am I as an AI user?" and their models will generate two explanations that cannot be meaningfully compared.</p>
+            <p>Assessment requires a rubric. Everyone is measured against the same criteria.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 02: Meaningful Evidence -->
+    <div class="sdc">
+      <div class="sdc-inner">
+        <div class="sdc-front">
+          <svg class="card-icon icon-glass" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle class="ic-glass-circle" cx="21" cy="21" r="13" stroke="#e8643b" stroke-width="2.4"/>
+            <line class="ic-glass-handle" x1="30.5" y1="30.5" x2="46" y2="46" stroke="#e8643b" stroke-width="2.4" stroke-linecap="round"/>
+            <path class="ic-check" d="M15 21 L19 25 L27 16" stroke="#e8643b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="sn">Meaningful Evidence</span>
+        </div>
+        <div class="sdc-back">
+          <span class="sid">02</span>
+          <span class="sn-back">Meaningful Evidence</span>
+          <div class="sd">
+            <p>Most AI assessments are built on thin data because users wisely withhold the personal information meaningful analysis requires.</p>
+            <p>We do not face that trade-off. We are a non-profit that gives you our tools, and asks for zero data in return.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 03: Shared Language -->
+    <div class="sdc">
+      <div class="sdc-inner">
+        <div class="sdc-front">
+          <svg class="card-icon icon-bubbles" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path class="ic-bubble-1" d="M4 9 Q4 5 8 5 H28 Q32 5 32 9 V19 Q32 23 28 23 H16 L9 30 V23 H8 Q4 23 4 19 Z" stroke="#e8643b" stroke-width="2.4" stroke-linejoin="round" fill="none"/>
+            <path class="ic-bubble-2" d="M24 23 Q24 19 28 19 H44 Q48 19 48 23 V33 Q48 37 44 37 H43 V43 L36 37 H28 Q24 37 24 33 Z" stroke="#e8643b" stroke-width="2" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="sn">Shared Language</span>
+        </div>
+        <div class="sdc-back">
+          <span class="sid">03</span>
+          <span class="sn-back">Shared Language</span>
+          <div class="sd">
+            <p>A named gap is not a verdict but a map. It shows where growth can be found.</p>
+            <p>Shared language enables collective learning. This is how the Co-Intelligence Readiness Framework transforms personal anxiety into collective development.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var cards = document.querySelectorAll('.sdc');
+  var icons = document.querySelectorAll('.card-icon');
+
+  // Cards stagger in on scroll, then icons run their full animation sequence
+  // once all three cards have settled.
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        cards.forEach(function(card, i) {
+          setTimeout(function() {
+            card.classList.add('visible');
+          }, i * 200);
+        });
+
+        // Last card starts at 400ms, entrance transition is 700ms -> settles ~1100ms.
+        // Icons begin shortly after, staggered slightly across the three cards.
+        icons.forEach(function(icon, i) {
+          setTimeout(function() {
+            icon.classList.add('icon-in');
+          }, 1150 + i * 120);
+        });
+
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.15 });
+
+  observer.observe(document.querySelector('.sdgrid'));
+
+  // Touch devices: tap toggles the revealed state instead of :hover.
+  // Tapping a card opens it and closes whichever other card was open.
+  // Tapping the same open card again closes it.
+  function isTouchDevice() {
+    return !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  }
+
+  cards.forEach(function(card) {
+    card.addEventListener('click', function() {
+      if (!isTouchDevice()) return;
+      var wasActive = card.classList.contains('is-active');
+      cards.forEach(function(c) { c.classList.remove('is-active'); });
+      if (!wasActive) {
+        card.classList.add('is-active');
+      }
+    });
+  });
+
+  // iframe height reporting
+  function sendHeight() {
+    window.parent.postMessage({ type: 'X-resize', height: document.body.scrollHeight }, '*');
+  }
+  window.addEventListener('load', function() { setTimeout(sendHeight, 200); });
+  window.addEventListener('resize', function() { setTimeout(sendHeight, 100); });
+  if (window.ResizeObserver) {
+    new ResizeObserver(function() { setTimeout(sendHeight, 100); }).observe(document.body);
+  }
+</script>
+</body>
+</html>
