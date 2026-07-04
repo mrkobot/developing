@@ -52,18 +52,23 @@
     position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 14px;
+    border-radius: 3px;
     background: #ede9e4;
-    border: 5px solid rgba(255,255,255,0.85);
+    border: none;
     overflow: hidden;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    box-shadow: 4px 6px 18px rgba(0,0,0,0.45), 1px 2px 5px rgba(0,0,0,0.25);
   }
 
-  /* Revealed state: driven by :hover on non-touch devices, by .is-active
-     (tap-toggled via JS) on touch devices. Same visual result either way. */
+
+  /* Per-card post-it colors */
+  .sdgrid .sdc:nth-child(1) .sdc-inner { background: linear-gradient(160deg, #E2FCA0 0%, #D4F588 100%); }
+  .sdgrid .sdc:nth-child(2) .sdc-inner { background: linear-gradient(160deg, #EDD9A3 0%, #E4CC8E 100%); }
+  .sdgrid .sdc:nth-child(3) .sdc-inner { background: linear-gradient(160deg, #BBBAF5 0%, #A9A8EE 100%); }
+
   .sdc.is-active .sdc-inner {
     transform: scale(1.025);
-    box-shadow: 0 0 40px rgba(255,255,255,0.12);
+    box-shadow: 6px 10px 28px rgba(0,0,0,0.55), 2px 4px 8px rgba(0,0,0,0.3);
   }
 
   .sdc.is-active .sdc-front {
@@ -81,7 +86,7 @@
   @media (hover: hover) and (pointer: fine) {
     .sdc.visible:hover .sdc-inner {
       transform: scale(1.025);
-      box-shadow: 0 0 40px rgba(255,255,255,0.12);
+      box-shadow: 6px 10px 28px rgba(0,0,0,0.55), 2px 4px 8px rgba(0,0,0,0.3);
     }
 
     .sdc.visible:hover .sdc-front {
@@ -97,7 +102,6 @@
     }
   }
 
-  /* Front and back occupy the same space; reveal crossfades one into the other */
   .sdc-front,
   .sdc-back {
     position: absolute;
@@ -132,7 +136,7 @@
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.12em;
-    color: #e8643b;
+    color: #0a0a0a;
     margin-bottom: 8px;
   }
 
@@ -155,12 +159,11 @@
     font-family: 'Inter', sans-serif;
     font-size: 11.5px;
     line-height: 1.65;
-    color: #000;
+    color: #0a0a0a;
   }
 
   .sd p + p { margin-top: 8px; }
 
-  /* Icon container — visible immediately, internal parts carry the animation */
   .card-icon {
     width: 52px;
     height: 52px;
@@ -168,7 +171,7 @@
     flex-shrink: 0;
   }
 
-  /* ---- Ruler (Common Standards): outline draws, then ticks rise in sequence ---- */
+  /* ---- Ruler (Common Standards) ---- */
   .icon-ruler .ic-outline {
     stroke-dasharray: 116;
     stroke-dashoffset: 116;
@@ -187,7 +190,7 @@
   .card-icon.icon-in.icon-ruler .ic-tick:nth-of-type(4) { animation: tickIn 0.3s ease forwards; animation-delay: 0.86s; }
   .card-icon.icon-in.icon-ruler .ic-tick:nth-of-type(5) { animation: tickIn 0.3s ease forwards; animation-delay: 1.04s; }
 
-  /* ---- Magnifying glass (Meaningful Evidence): lens enlarges, handle settles, check draws ---- */
+  /* ---- Magnifying glass (Meaningful Evidence) ---- */
   .icon-glass .ic-glass-circle {
     transform-box: fill-box;
     transform-origin: center;
@@ -216,7 +219,7 @@
     animation-delay: 0.95s;
   }
 
-  /* ---- Speech bubbles (Shared Language): first bubble in, second follows ---- */
+  /* ---- Speech bubbles (Shared Language) ---- */
   .icon-bubbles .ic-bubble-1 {
     transform-box: fill-box;
     transform-origin: center;
@@ -246,7 +249,7 @@
   }
   @keyframes handleIn { to { transform: scale(1); opacity: 1; } }
   @keyframes bubble1In { to { transform: scale(1); opacity: 1; } }
-  @keyframes bubble2In { to { transform: scale(1); opacity: 0.55; } }
+  @keyframes bubble2In { to { transform: scale(1); opacity: 0.65; } }
 
   /* ---- Org invitation ---- */
   .org-invite {
@@ -255,8 +258,8 @@
   }
 
   .org-text {
-    font-size: 19px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     color: #fff;
     line-height: 1.5;
     margin-bottom: 20px;
@@ -264,9 +267,9 @@
 
   .org-toggle-btn {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
-    padding: 8px 20px;
+    padding: 9px 22px;
     border-radius: 6px;
     cursor: pointer;
     border: 1px solid #666;
@@ -304,9 +307,10 @@
 
   .org-form-inner input,
   .org-form-inner textarea {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 11px 15px;
     border-radius: 6px;
     border: 1px solid #333;
     background: #111;
@@ -318,7 +322,7 @@
 
   .org-form-inner input::placeholder,
   .org-form-inner textarea::placeholder {
-    color: #777;
+    color: #666;
   }
 
   .org-form-inner input:focus,
@@ -332,7 +336,7 @@
 
   .org-form-inner textarea {
     resize: none;
-    height: 72px;
+    height: 80px;
   }
 
   .org-submit-row {
@@ -344,9 +348,9 @@
 
   .org-submit-btn {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 9px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 26px;
     border-radius: 6px;
     cursor: pointer;
     border: 1px solid #e8643b;
@@ -368,7 +372,7 @@
 
   .org-confirm {
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     color: #ccc;
     padding: 20px 0 0;
     display: none;
@@ -385,7 +389,7 @@
     .icon-glass .ic-glass-handle { transform: scale(1); opacity: 1; }
     .icon-glass .ic-check { stroke-dashoffset: 0; }
     .icon-bubbles .ic-bubble-1 { transform: scale(1); opacity: 1; }
-    .icon-bubbles .ic-bubble-2 { transform: scale(1); opacity: 0.55; }
+    .icon-bubbles .ic-bubble-2 { transform: scale(1); opacity: 0.65; }
   }
 
   @media (max-width: 720px) {
@@ -406,11 +410,11 @@
       <div class="sdc-inner">
         <div class="sdc-front">
           <svg class="card-icon icon-ruler" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect class="ic-outline" x="4" y="19" width="44" height="14" rx="3" stroke="#e8643b" stroke-width="2.4" fill="none"/>
-            <line class="ic-tick" x1="13" y1="19" x2="13" y2="25" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
-            <line class="ic-tick" x1="22" y1="19" x2="22" y2="27" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
-            <line class="ic-tick" x1="31" y1="19" x2="31" y2="25" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
-            <line class="ic-tick" x1="40" y1="19" x2="40" y2="25" stroke="#e8643b" stroke-width="2" stroke-linecap="round"/>
+            <rect class="ic-outline" x="4" y="19" width="44" height="14" rx="3" stroke="#0a0a0a" stroke-width="2.4" fill="none"/>
+            <line class="ic-tick" x1="13" y1="19" x2="13" y2="25" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round"/>
+            <line class="ic-tick" x1="22" y1="19" x2="22" y2="27" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round"/>
+            <line class="ic-tick" x1="31" y1="19" x2="31" y2="25" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round"/>
+            <line class="ic-tick" x1="40" y1="19" x2="40" y2="25" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round"/>
           </svg>
           <span class="sn">Common Standards</span>
         </div>
@@ -430,9 +434,9 @@
       <div class="sdc-inner">
         <div class="sdc-front">
           <svg class="card-icon icon-glass" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle class="ic-glass-circle" cx="21" cy="21" r="13" stroke="#e8643b" stroke-width="2.4"/>
-            <line class="ic-glass-handle" x1="30.5" y1="30.5" x2="46" y2="46" stroke="#e8643b" stroke-width="2.4" stroke-linecap="round"/>
-            <path class="ic-check" d="M15 21 L19 25 L27 16" stroke="#e8643b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle class="ic-glass-circle" cx="21" cy="21" r="13" stroke="#0a0a0a" stroke-width="2.4"/>
+            <line class="ic-glass-handle" x1="30.5" y1="30.5" x2="46" y2="46" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round"/>
+            <path class="ic-check" d="M15 21 L19 25 L27 16" stroke="#0a0a0a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
           <span class="sn">Meaningful Evidence</span>
         </div>
@@ -452,8 +456,8 @@
       <div class="sdc-inner">
         <div class="sdc-front">
           <svg class="card-icon icon-bubbles" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path class="ic-bubble-1" d="M4 9 Q4 5 8 5 H28 Q32 5 32 9 V19 Q32 23 28 23 H16 L9 30 V23 H8 Q4 23 4 19 Z" stroke="#e8643b" stroke-width="2.4" stroke-linejoin="round" fill="none"/>
-            <path class="ic-bubble-2" d="M24 23 Q24 19 28 19 H44 Q48 19 48 23 V33 Q48 37 44 37 H43 V43 L36 37 H28 Q24 37 24 33 Z" stroke="#e8643b" stroke-width="2" stroke-linejoin="round" fill="none"/>
+            <path class="ic-bubble-1" d="M4 9 Q4 5 8 5 H28 Q32 5 32 9 V19 Q32 23 28 23 H16 L9 30 V23 H8 Q4 23 4 19 Z" stroke="#0a0a0a" stroke-width="2.4" stroke-linejoin="round" fill="none"/>
+            <path class="ic-bubble-2" d="M24 23 Q24 19 28 19 H44 Q48 19 48 23 V33 Q48 37 44 37 H43 V43 L36 37 H28 Q24 37 24 33 Z" stroke="#0a0a0a" stroke-width="2" stroke-linejoin="round" fill="none"/>
           </svg>
           <span class="sn">Shared Language</span>
         </div>
@@ -483,7 +487,7 @@
           <button class="org-submit-btn" id="org-submit" onclick="orgSubmit()">Send</button>
         </div>
       </div>
-      <p class="org-confirm" id="org-confirm">Thank you. We'll be in touch shortly. You can also reach us directly at <a href="mailto:hello@whatiflove.org" style="color:#e8643b;text-decoration:underline;text-underline-offset:2px;">hello@whatiflove.org</a>.</p>
+      <p class="org-confirm" id="org-confirm">We'll be in touch shortly. You can also reach us directly at <a href="mailto:hello@whatiflove.org" style="color:#e8643b;text-decoration:underline;text-underline-offset:2px;">hello@whatiflove.org</a>.</p>
     </div>
   </div>
 
@@ -496,8 +500,8 @@
     return !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   }
 
-  var entranceStagger = 200;   // ms between each card's entrance start
-  var entranceDuration = 700;  // matches .sdc transition duration
+  var entranceStagger = 200;
+  var entranceDuration = 700;
 
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
@@ -510,18 +514,13 @@
             card.classList.add('visible');
           }, revealDelay);
 
-          // Each icon animates as soon as its own card has settled in —
-          // not after all three cards have finished revealing.
           setTimeout(function() {
             icon.classList.add('icon-in');
           }, revealDelay + entranceDuration);
         });
 
-        // Mobile only: auto-reveal the first card once its icon has had
-        // time to play, so touch users learn these cards are tappable
-        // without needing to guess.
         if (isTouchDevice()) {
-          var firstIconDuration = 1400; // length of the longest icon sequence (ruler)
+          var firstIconDuration = 1400;
           setTimeout(function() {
             cards[0].classList.add('is-active');
           }, entranceDuration + firstIconDuration + 400);
@@ -534,10 +533,6 @@
 
   observer.observe(document.querySelector('.sdgrid'));
 
-  // Touch devices: tap toggles the revealed state instead of :hover.
-  // Tapping a card opens it and closes whichever other card was open
-  // (including the auto-revealed first card). Tapping the same open
-  // card again closes it.
   cards.forEach(function(card) {
     card.addEventListener('click', function() {
       if (!isTouchDevice()) return;
@@ -549,7 +544,6 @@
     });
   });
 
-  // iframe height reporting
   function sendHeight() {
     window.parent.postMessage({ type: 'X-resize', height: document.body.scrollHeight }, '*');
   }
@@ -559,7 +553,6 @@
     new ResizeObserver(function() { setTimeout(sendHeight, 100); }).observe(document.body);
   }
 
-  // Org invitation form
   function orgOpen() {
     var wrap = document.getElementById('org-form-wrap');
     if (wrap.classList.contains('open')) return;
@@ -584,7 +577,6 @@
     }
   }
 
-  // Desktop: hover opens, click closes
   var orgBtn = document.getElementById('org-toggle');
   orgBtn.addEventListener('mouseenter', function() {
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
