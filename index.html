@@ -136,30 +136,30 @@
   @keyframes stackIn   { to { transform: scaleX(1); opacity: 1; } }
 
   .org-invite { padding: 6rem 0 0.5rem; text-align: center; }
-  .org-text { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.5; margin-bottom: 20px; }
+  .org-text { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.5; margin-bottom: 32px; }
   .org-toggle-btn {
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
-    padding: 9px 22px; border-radius: 6px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600;
+    padding: 15px 38px; border-radius: 8px; cursor: pointer;
     border: 1px solid #666; background: transparent; color: #fff;
     letter-spacing: 0.01em; transition: all 0.15s ease;
   }
   .org-toggle-btn:hover { border-color: #888; color: #ddd; }
   .org-form-wrap { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease; opacity: 0; }
   .org-form-wrap.open { max-height: 400px; opacity: 1; }
-  .org-form-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 520px; margin: 20px auto 0; text-align: left; }
+  .org-form-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 540px; margin: 26px auto 0; text-align: left; }
   .org-form-inner input, .org-form-inner textarea {
-    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 400;
-    padding: 11px 15px; border-radius: 6px; border: 1px solid #333;
+    font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 400;
+    padding: 13px 16px; border-radius: 6px; border: 1px solid #333;
     background: #111; color: #fff; outline: none; transition: border-color 0.15s ease; width: 100%;
   }
   .org-form-inner input::placeholder, .org-form-inner textarea::placeholder { color: #666; }
   .org-form-inner input:focus, .org-form-inner textarea:focus { border-color: #666; }
   .org-field-full { grid-column: 1 / -1; }
-  .org-form-inner textarea { resize: none; height: 80px; }
+  .org-form-inner textarea { resize: none; height: 84px; }
   .org-submit-row { grid-column: 1 / -1; display: flex; justify-content: center; padding-top: 4px; }
   .org-submit-btn {
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-    padding: 10px 26px; border-radius: 6px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+    padding: 13px 32px; border-radius: 8px; cursor: pointer;
     border: 1px solid #e8643b; background: #e8643b; color: #fff;
     letter-spacing: 0.01em; transition: all 0.15s ease;
   }
@@ -374,38 +374,12 @@
 
   observer.observe(document.querySelector('.sdgrid'));
 
-  var flipBackDelay = 420; // matches sdc-front/back transition duration
-
-  function replayIcon(card) {
-    var icon = card.querySelector('.card-icon');
-    if (!icon) return;
-    icon.classList.remove('icon-in');
-    // getBoundingClientRect forces a reflow reliably on SVG elements
-    // (offsetWidth is not consistently supported on <svg> across browsers).
-    icon.getBoundingClientRect();
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        icon.classList.add('icon-in');
-      });
-    });
-  }
-
   cards.forEach(function(card) {
     card.addEventListener('click', function() {
       if (!isTouchDevice()) return;
       var wasActive = card.classList.contains('is-active');
       cards.forEach(function(c) { c.classList.remove('is-active'); });
-      if (!wasActive) {
-        card.classList.add('is-active');
-      } else {
-        setTimeout(function() { replayIcon(card); }, flipBackDelay);
-      }
-    });
-
-    card.addEventListener('mouseleave', function() {
-      if (isTouchDevice()) return;
-      if (!card.classList.contains('visible')) return;
-      setTimeout(function() { replayIcon(card); }, flipBackDelay);
+      if (!wasActive) card.classList.add('is-active');
     });
   });
   function sendHeight() {
