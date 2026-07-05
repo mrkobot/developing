@@ -39,7 +39,7 @@
 
   /* Row 1 — framework cards */
   .sdgrid .sdc:nth-child(1) .sdc-inner { background: linear-gradient(160deg, #E2FCA0 0%, #D4F588 100%); }
-  .sdgrid .sdc:nth-child(2) .sdc-inner { background: linear-gradient(160deg, #EDD9A3 0%, #E4CC8E 100%); }
+  .sdgrid .sdc:nth-child(2) .sdc-inner { background: linear-gradient(160deg, #F5D389 0%, #F0B942 100%); }
   .sdgrid .sdc:nth-child(3) .sdc-inner { background: linear-gradient(160deg, #BBBAF5 0%, #A9A8EE 100%); }
   /* Row 2 — outcome cards */
   .sdgrid .sdc:nth-child(4) .sdc-inner { background: linear-gradient(160deg, #C8EEEE 0%, #B4E4E4 100%); }
@@ -62,6 +62,12 @@
   }
   .sdc-front { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; opacity: 1; transform: translateY(0); }
   .sdc-back  { display: flex; flex-direction: column; justify-content: center; text-align: left; opacity: 0; transform: translateY(10px); pointer-events: none; }
+
+  .sdc-index {
+    position: absolute; top: 12px; left: 14px; z-index: 2; pointer-events: none;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 0.03em; color: rgba(10,10,10,0.4);
+  }
 
   .sn  { font-size: 18px; font-weight: 800; color: #0a0a0a; line-height: 1.2; }
   .sn-back { font-size: 21px; font-weight: 800; color: #0a0a0a; line-height: 1.25; margin-bottom: 10px; }
@@ -201,6 +207,7 @@
     <!-- Common Standards -->
     <div class="sdc">
       <div class="sdc-inner">
+        <span class="sdc-index">01</span>
         <div class="sdc-front">
           <svg class="card-icon icon-ruler" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect class="ic-outline" x="4" y="19" width="44" height="14" rx="3" stroke="#0a0a0a" stroke-width="2.4" fill="none"/>
@@ -221,6 +228,7 @@
     <!-- Meaningful Evidence -->
     <div class="sdc">
       <div class="sdc-inner">
+        <span class="sdc-index">02</span>
         <div class="sdc-front">
           <svg class="card-icon icon-glass" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle class="ic-glass-circle" cx="21" cy="21" r="13" stroke="#0a0a0a" stroke-width="2.4"/>
@@ -239,6 +247,7 @@
     <!-- Shared Language -->
     <div class="sdc">
       <div class="sdc-inner">
+        <span class="sdc-index">03</span>
         <div class="sdc-front">
           <svg class="card-icon icon-bubbles" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path class="ic-bubble-1" d="M4 9 Q4 5 8 5 H28 Q32 5 32 9 V19 Q32 23 28 23 H16 L9 30 V23 H8 Q4 23 4 19 Z" stroke="#0a0a0a" stroke-width="2.4" stroke-linejoin="round" fill="none"/>
@@ -256,6 +265,7 @@
     <!-- Equitable Voice -->
     <div class="sdc">
       <div class="sdc-inner">
+        <span class="sdc-index">04</span>
         <div class="sdc-front">
           <svg class="card-icon icon-share" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle class="ic-share-origin" cx="10" cy="26" r="4" stroke="#0a0a0a" stroke-width="2.2" fill="none"/>
@@ -276,6 +286,7 @@
     <!-- Built-In Buy-In -->
     <div class="sdc">
       <div class="sdc-inner">
+        <span class="sdc-index">05</span>
         <div class="sdc-front">
           <svg class="card-icon icon-merge" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path class="ic-mg-chevron" d="m8 6 4-4 4 4" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -294,6 +305,7 @@
     <!-- Durable Insight -->
     <div class="sdc">
       <div class="sdc-inner">
+        <span class="sdc-index">06</span>
         <div class="sdc-front">
           <svg class="card-icon icon-stack" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <line class="ic-stack-1" x1="18" y1="38" x2="34" y2="38" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round"/>
